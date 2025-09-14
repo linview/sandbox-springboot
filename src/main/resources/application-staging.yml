@@ -1,0 +1,72 @@
+# 预发布环境配置
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/devops_platform_staging?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME:staging_user}
+    password: ${DB_PASSWORD:staging_password}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update  # 预发布环境：更新表结构，保留数据
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  sql:
+    init:
+      mode: never  # 预发布环境不执行初始化脚本
+
+  application:
+    name: devops-platform-staging
+
+server:
+  port: 8083  # 预发布环境使用不同端口
+
+# 预发布环境日志配置
+logging:
+  level:
+    com.devops.platform: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/devops-platform-staging.log
+
+# 预发布环境监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# 预发布环境特定配置
+devops:
+  platform:
+    environment: staging
+    debug: true
+    cache:
+      enabled: true
+      ttl: 300  # 5分钟缓存
+

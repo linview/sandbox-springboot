@@ -1,0 +1,45 @@
+# 测试环境配置
+spring:
+  datasource:
+    url: jdbc:h2:mem:devops_platform_test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 测试环境：每次启动都重新创建表
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  sql:
+    init:
+      mode: never  # 测试环境不执行初始化脚本
+
+  application:
+    name: devops-platform-test
+
+server:
+  port: 8082  # 测试环境使用不同端口
+
+# 测试环境特定配置
+logging:
+  level:
+    com.devops.platform: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# 测试环境监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
